@@ -1,0 +1,519 @@
+@charset "UTF-8";
+
+//--------------------------------
+// Define Mixins List
+// 
+// 1. inline-block
+// 2. Horizontal center
+// 3. flat and reset float
+// 4. clearfix(clear float)
+// 5. Image replacement
+// 6. Hide Element
+// 7. text overflow
+// 8. opacity
+// 9. disabled
+// 10. min height
+// 11. content
+// 12. triangle	
+// 13. emCalc (px to em)
+// 14. remCalc (px to rem)
+// 15. semi-transparent colors
+//--------------------------------
+
+//--------------------------------
+//1. inline-block
+//--------------------------------
+
+
+$inline-block-alignment: middle !default;
+
+
+@mixin inline-block($alignment: $inline-block-alignment) {
+  display: inline-block;
+  @if $alignment and $alignment != none {
+    vertical-align: $alignment;
+  }
+  @if $legacy-support-for-ie {
+    *vertical-align: auto;
+    zoom: 1;
+    *display: inline;
+  }
+}
+
+
+//---------------------------------
+//2. Horizontal center
+//---------------------------------
+
+//To set the `width` block specific value added `margin-left` and `margin-right` value `auto`, implementation elements horizontally
+
+@mixin horizontal-center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+%horizontal-center{
+	@include horizontal-center;
+}
+
+//-------------------------------------
+//3. foat and reset float
+//-------------------------------------
+
+//1)
+
+@mixin float($side: left){
+	float: unquote($side);
+	@if $legacy-support-for-ie{
+		_display: inline;
+	}
+}
+
+//2).Set left float
+@mixin pull-left{
+	@include float(left);
+}
+
+%pull-left{
+	@include float(left);
+}
+
+//3).Set right float
+
+@mixin pull-right{
+	@include float(right);
+}
+
+%pull-right {
+	@include float(right);
+}
+
+//4).Reset Floating
+
+@mixin reset-float($display:block){
+	float: none;
+	display: $display;
+}
+
+//---------------------------------------
+//4. Clearfix (clear float)
+//---------------------------------------
+
+
+
+@mixin clearfix {
+	@if $legacy-support-for-ie {
+		*zoom: 1;
+	}
+	&:before,
+	&:after {
+		content: "";
+		display: table;
+	}
+	&:after {
+		clear: both;
+		overflow: hidden;
+	}
+}
+
+%clearfix {
+	@include clearfix;
+}
+
+//-----------------------------------------
+// 5. Image replacement
+/
+//-----------------------------------------
+
+@mixin ir {
+	background-color: transparent;
+	border: 0;
+	overflow: hidden;
+	@if $legacy-support-for-ie {
+		*text-indent: -150%;
+	}
+	
+	&:before {
+		content: "";
+		display: block;
+		width: 0;
+		height: 150%;
+	}
+}
+
+%ir {
+	@include ir;
+}
+
+//--------------------------------------------
+// 6. Hide Element
+// 6.1:Browsers and screen readers are hidden(hidden)
+// 6.2:only browser hide (visuallyhidden)
+// 6.3:Hidden elements, but occupies space（invisible）
+//--------------------------------------------
+
+
+//1.Browsers and screen readers are hidden
+@mixin hidden {
+	display: none !important;
+	visibility: hidden;
+}
+
+%hidden {
+	@include hidden;
+}
+
+//2.only browser hide
+
+@mixin visuallyhidden {
+	@if $legacy-support-for-ie {
+		clip: rect(0,0,0,0);
+	}
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	
+	&.focusable:active,
+	&.focusable:focus {
+		clip: auto;
+		height: auto;
+		margin: 0;
+		overflow: visible;
+		position: static;
+		width: auto;
+	}
+}
+
+%visuallyhidden {
+	@include visuallyhidden;
+}
+
+//3.Hidden elements, but occupies space
+
+@mixin invisible {
+	visibility: hidden;
+}
+
+%invisible {
+	@include invisible;
+}
+
+//-------------------------------------
+// 7. text-overflow
+// 7.1 Single line interception Text
+// 7.2 Multi-line text interception
+//--------------------------------------
+
+//1.Single line interception Text
+
+@mixin singleline-ellipsis($substract:0){
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100% - $substract;
+}
+
+%singleline-ellipsis {
+	@include singleline-ellipsis;
+}
+
+//2. Multi-line text interception 
+
+//----------------------------------------
+// 8. Opacity
+//----------------------------------------
+
+@mixin opacity($opacity:50) {
+  opacity: $opacity / 100;
+  @if $filter{
+    filter: alpha(opacity=$opacity);
+  }
+}
+
+//----------------------------------------
+// 9. disabled
+//----------------------------------------
+
+@mixin disabled($bgColor: #e6e6e6,$textColor:#ababab){
+	background-color: $bgColor !important;
+	color: $textColor !important;
+	cursor: not-allowed !important;
+}
+
+//----------------------------------------
+// 10. min height
+//----------------------------------------
+
+@mixin min-height($height){
+	min-height: $height;
+	height: auto !important;
+	@if $legacy-support-for-ie {
+		_height: $height;
+	}
+}
+
+//-----------------------------------------
+// 11. content
+//-----------------------------------------
+
+@mixin content{
+	content: "";
+	display: block;
+	width: 0;
+	height: 0;
+}
+
+%content {
+	@include content;
+}
+
+//----------------------------------------
+// 12. triangle
+//----------------------------------------
+
+//1. $size 30px
+//2. $color#000
+//3. $bgColor #111
+//4. $direction up
+//5. $inner false
+//6. $transparent
+@mixin triangle ($size:30px,$color:#000,$bgColor:#111,$direction:up,$inner:false,$transparent:false){
+	 @extend %content;
+   
+   position: absolute;
+
+	 @if ($direction == up) or ($direction == right) or ($direction == down) or ($direction == left) {
+
+		 border: ($size / 2) solid transparent;
+               
+
+     @if $direction == up { 
+
+		 		@if $inner {  
+        	border-color: $bgColor transparent transparent transparent; 
+          border-bottom-width: 0;
+          top: 0;
+        } @else { 
+          border-color:  transparent transparent $color transparent;  
+          border-top-width: 0;
+          bottom: 100%;
+        }
+        
+        //$transparent = true          
+        @if $transparent {
+        	border-color: transparent $color $color $color;
+          border-top-width: $size / 2;
+          border-bottom-width: 0;
+				} 
+			}
+               
+  
+      @else if $direction == right {
+      	@if $inner {  
+					border-color:  transparent $bgColor transparent transparent; 
+          border-left-width: 0;
+          right: 0;
+        } @else {
+					border-color:  transparent transparent transparent $color;  
+          border-right-width: 0;
+          left: 100%;
+        }
+        @if $transparent {
+           border-color:  $color transparent $color $color;
+           border-right-width: $size / 2;
+           border-left-width: 0;
+        }  
+      }
+                
+
+      @else if $direction == down {
+         @if $inner {  
+            border-color:  transparent  transparent $bgColor transparent; 
+            border-top-width: 0;
+            bottom: 0;
+         } @else {
+            border-color: $color transparent transparent transparent;  
+            border-bottom-width: 0;
+            top: 100%;
+         }
+         @if $transparent {
+            border-color:  $color $color transparent $color;
+            border-bottom-width: $size / 2;
+            border-top-width: 0;
+         }  
+      }
+                
+
+      @else if $direction == left {
+         @if $inner {  
+            border-color:  transparent transparent transparent $bgColor; 
+            border-right-width: 0;
+            left: 0;
+         } @else {
+            border-color:  transparent $color transparent transparent;  
+            border-left-width: 0;
+            right: 100%;
+         }
+				 @if $transparent {
+            border-color:  $color $color $color transparent;
+            border-left-width: $size / 2;
+            border-right-width: 0;
+         }  
+       }
+     }  
+              
+
+		@else if ($direction == up-right) or ($direction == up-left) {
+    	border-top: $size solid $color;
+			top: 100%;
+			
+			@if $direction == up-right {
+      	border-left:  $size solid transparent;
+				left: 0;
+
+			} @else if $direction == up-left {
+      	border-right: $size solid transparent;
+				right:0;
+			}
+		}
+
+		
+		@else if ($direction == down-right) or ($direction == down-left) {
+    	border-bottom: $size solid $color;
+			bottom: 100%;
+
+			@if $direction == down-right {
+      	border-left:  $size solid transparent;
+				left: 0;
+			} @else if $direction == down-left {
+      	border-right: $size solid transparent;
+				right: 0;
+			}
+		}
+}
+
+//------------------------------------------
+//13. emCalc 
+//------------------------------------------
+
+//13.1:$base Is relative to its parent element font-size
+//13.2:Can accept multiple properties, or more attribute values
+//13.3:Accepts only numeric values
+//13.4:Use
+//		 @include emCalc(line-height, 30)
+//		 @include emCalc(line-height, 30, 16)
+//		 @include emCalc(width height, 125);
+//		 @include emCalc(padding, 0 25, 16);
+//		 @include emCalc(text-shadow, (#0d6e28 1 1) (#777 0 0 2), 16);
+//		 @include emCalc(box-shadow, (inset 0 0 0 1 #2a9022) (inset 0 0 3 #459966), 16);
+
+@mixin emCalc($props,$sizes,$base:$base-font-size){
+	$values: ();
+	$sublists: false;
+	
+	@each $s in $sizes {
+		
+		@if type-of($s) == list {
+			$sublists: true;
+			$vv: ();
+			@each $ss in $s {
+				$vv: append($vv,if(type-of($ss) == number, #{$ss / $base}em, $ss));
+			}
+			$values: append($values,join((), $vv));
+		}
+		@else {
+			$values: append($values,if(type-of($s) == number, #{$s / $base}em, $s));
+		}
+	}
+	$value: join((), $values, if($sublists,comma,space));
+	@each $prop in $props {#{$prop}: $value}
+}
+
+//------------------------------------------
+// 14. remCalc() (px to rem)
+//------------------------------------------
+// 14.1 $property 
+// 14.2 $values... 
+// 14.3 remCalc(width,45)
+// 14.4 remCalc(margin,.1,.2,1)
+
+@mixin remCalc($property,$values...){
+	$pxValues: "";
+	$remValues: "";
+	$browser-default-font-size: strip-units($browser-default-font-size);
+	@each $value in $values {
+		$pxValues: #{$pxValues + " " + $value * $browser-default-font-size}px;
+		$remValues: #{$remValues + " " + $value}rem;
+	}
+	#{$property}: $pxValues;
+  #{$property}: $remValues;
+}     
+
+//-------------------------------------------
+// 15. Semi-Ttransparent Colors
+// support css attribute: color,background-color,border-color,outline-color
+//eg. @include semi-transparent-colors("background-color",rgba(black,.6),white);
+//-------------------------------------------
+@mixin semi-transparent-colors($attribute,$color,$background){
+	$percent: alpha($color) * 100%; 
+  $opaque: opacify($color,1); 
+  $solid-color: mix($opaque,$background,$percent);
+  @if ($percent < 100%) {
+    #{$attribute}: $solid-color;   
+  }
+  #{$attribute}: $color;
+}
+
+
+//------------------------------------------
+// Define Function list
+
+// 1. strip-units() 
+// 2. pxToem() px to em
+// 3. pxTorem() px to rem
+//-------------------------------------------
+
+
+//-------------------------------------------
+//1. strip-units()
+//-------------------------------------------
+
+
+// eg. strip-units(12px) => 12
+
+@function strip-units($number){
+	@return $number / ($number * 0 + 1);
+}     
+
+//-------------------------------------------
+// 2. pxToem() 
+//-------------------------------------------
+
+
+
+@function pxToem($target-size,$context:$base-font-size) {
+	@if not unitless($target-size) { //unitless(12) => true, unitless(12px) => false
+		$target-size: strip-units($target-size);
+	}
+	@if not unitless($context){
+		$context: strip-units($context);
+	}
+	@return ($target-size / $context) * 1em;
+}
+
+
+//-------------------------------------------
+// 3. pxTorem()
+//-------------------------------------------
+
+
+// pxTorem(12px)
+
+@function pxTorem($px){
+	@return $px / $browser-default-font-size * 1rem;
+}
